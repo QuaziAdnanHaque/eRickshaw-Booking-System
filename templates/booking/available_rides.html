@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Available Rides</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 p-10">
+    <h1 class="text-3xl font-bold mb-6">Available Ride Requests</h1>
+
+    <div class="space-y-4">
+      {% for ride in rides %}
+
+      <div class="bg-white p-6 rounded-lg shadow">
+        <p><strong>Customer:</strong> {{ ride.customer.username }}</p>
+
+        <p><strong>Pickup:</strong> {{ ride.pickup }}</p>
+
+        <p><strong>Drop:</strong> {{ ride.drop }}</p>
+
+        <p><strong>Distance:</strong> {{ ride.distance }} km</p>
+
+        <p><strong>Fare:</strong> ₹{{ ride.fare }}</p>
+
+        <form method="post" action="{% url 'booking:accept_ride' ride.id %}">
+          {% csrf_token %}
+          <button type="submit">Accept Ride</button>
+        </form>
+      </div>
+
+      {% empty %}
+
+      <div class="bg-white p-6 rounded-lg shadow">
+        No rides available right now.
+      </div>
+
+      {% endfor %}
+    </div>
+  </body>
+</html>

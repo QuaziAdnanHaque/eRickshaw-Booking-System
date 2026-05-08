@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eRickshaw Booking - Register</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=Work+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Work Sans", sans-serif;
+      }
+      .bg-hero {
+        background:
+          linear-gradient(rgba(247, 249, 251, 0.9), rgba(247, 249, 251, 0.9)),
+          url("https://images.unsplash.com/photo-1605559424843-9e4c228bf1c1");
+        background-size: cover;
+        background-position: center;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white border-b h-16 flex items-center">
+      <div class="max-w-6xl mx-auto w-full px-5 flex justify-between">
+        <h1
+          class="text-xl font-extrabold text-green-600 font-['Plus_Jakarta_Sans']"
+        >
+          eRickshaw Booking
+        </h1>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="flex-grow flex items-center justify-center p-6 bg-hero">
+      <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-8 space-y-6">
+        <!-- Heading -->
+        <div class="text-center">
+          <h2 class="text-2xl font-bold">Create Account</h2>
+          <p class="text-gray-500 text-sm">
+            Book or drive e-Rickshaws in your city
+          </p>
+        </div>
+
+        <!-- Global Error -->
+        {% if form.errors %}
+        <div class="bg-red-100 text-red-600 p-3 rounded text-sm">
+          Please fix the errors below
+        </div>
+        {% endif %}
+
+        <!-- Role Toggle -->
+        <div class="flex bg-gray-100 rounded-lg p-1">
+          <button
+            type="button"
+            id="customerBtn"
+            onclick="setRole('customer')"
+            class="flex-1 py-2 bg-white text-green-600 rounded-md shadow text-sm font-semibold"
+          >
+            Customer
+          </button>
+          <button
+            type="button"
+            id="driverBtn"
+            onclick="setRole('driver')"
+            class="flex-1 py-2 text-gray-500 text-sm font-semibold"
+          >
+            Driver
+          </button>
+        </div>
+
+        <!-- Form -->
+        <form method="post" class="space-y-4">
+          {% csrf_token %}
+
+          <!-- Hidden role -->
+          <input
+            type="hidden"
+            name="user_type"
+            id="user_type_input"
+            value="customer"
+          />
+
+          <!-- Username -->
+          <div>
+            <label class="block text-sm font-semibold">Username</label>
+            <input
+              type="text"
+              name="username"
+              value="{{ form.username.value|default:'' }}"
+              class="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-green-500"
+              placeholder="Enter username"
+            />
+            <div class="text-red-500 text-xs">{{ form.username.errors }}</div>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label class="block text-sm font-semibold">Email</label>
+            <input
+              type="email"
+              name="email"
+              value="{{ form.email.value|default:'' }}"
+              class="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-green-500"
+              placeholder="Enter email"
+            />
+            <div class="text-red-500 text-xs">{{ form.email.errors }}</div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label class="block text-sm font-semibold">Password</label>
+            <input
+              type="password"
+              name="password"
+              class="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-green-500"
+              placeholder="••••••••"
+            />
+            <div class="text-red-500 text-xs">{{ form.password.errors }}</div>
+          </div>
+
+          <!-- Submit -->
+          <button
+            type="submit"
+            class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:opacity-90"
+          >
+            Register
+          </button>
+        </form>
+
+        <!-- Login Link -->
+        <div class="text-center text-sm">
+          Already have an account?
+          <a href="{% url 'login' %}" class="text-green-600 font-semibold">
+            Login
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <!-- Script -->
+    <script>
+      function setRole(role) {
+        document.getElementById("user_type_input").value = role;
+
+        const customerBtn = document.getElementById("customerBtn");
+        const driverBtn = document.getElementById("driverBtn");
+
+        if (role === "customer") {
+          customerBtn.classList.add("bg-white", "text-green-600", "shadow");
+          driverBtn.classList.remove("bg-white", "text-green-600", "shadow");
+          driverBtn.classList.add("text-gray-500");
+        } else {
+          driverBtn.classList.add("bg-white", "text-green-600", "shadow");
+          customerBtn.classList.remove("bg-white", "text-green-600", "shadow");
+          customerBtn.classList.add("text-gray-500");
+        }
+      }
+    </script>
+  </body>
+</html>

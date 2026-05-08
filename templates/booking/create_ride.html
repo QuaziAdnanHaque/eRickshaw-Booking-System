@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Ride</title>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      #map {
+        height: 500px;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-100 p-8">
+    <div class="max-w-5xl mx-auto">
+      <!-- Heading -->
+      <div class="mb-6">
+        <h1 class="text-4xl font-bold text-green-700">Book an e-Rickshaw</h1>
+
+        <p class="text-gray-600 mt-2">
+          Select pickup and drop locations directly from the map
+        </p>
+      </div>
+
+      <!-- Map -->
+      <div id="map" class="rounded-xl overflow-hidden shadow-lg border"></div>
+
+      <!-- Form -->
+      <form method="post" class="mt-8 bg-white p-8 rounded-xl shadow-lg">
+        {% csrf_token %}
+
+        <!-- Pickup -->
+        <div class="mb-5">
+          <label class="block text-sm font-bold mb-2"> Pickup Location </label>
+
+          <input
+            type="text"
+            name="pickup"
+            id="pickup_location"
+            readonly
+            class="w-full p-3 border rounded-lg bg-gray-50"
+            placeholder="Select pickup from map"
+          />
+        </div>
+
+        <!-- Drop -->
+        <div class="mb-5">
+          <label class="block text-sm font-bold mb-2"> Drop Location </label>
+
+          <input
+            type="text"
+            name="drop"
+            id="drop_location"
+            readonly
+            class="w-full p-3 border rounded-lg bg-gray-50"
+            placeholder="Select drop from map"
+          />
+        </div>
+
+        <!-- Distance -->
+        <div class="mb-5">
+          <label class="block text-sm font-bold mb-2"> Distance (KM) </label>
+
+          <input
+            type="text"
+            name="distance"
+            id="distance_km"
+            readonly
+            class="w-full p-3 border rounded-lg bg-gray-50"
+            placeholder="Distance will appear automatically"
+          />
+        </div>
+
+        <!-- Fare -->
+        <div class="mb-8">
+          <label class="block text-sm font-bold mb-2"> Estimated Fare </label>
+
+          <input
+            type="text"
+            id="fare"
+            readonly
+            class="w-full p-3 border rounded-lg bg-gray-50"
+            placeholder="Fare will appear automatically"
+          />
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex gap-4">
+          <button
+            type="submit"
+            class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold"
+          >
+            Book Ride
+          </button>
+
+          <button
+            type="button"
+            onclick="resetMap()"
+            class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-semibold"
+          >
+            Reset
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      const FARE_PER_KM = 10;
+
+      // 🔑 Replace with your real OpenRouteService API key
+      const API_KEY =
+        "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjQ5MjM1ZWU5MDRmYzRjZTJiYWViYzIyMDI2MGI5MmM4IiwiaCI6Im11cm11cjY0In0=";
+
+      // Kolkata default location
+      const map = L.map("map").setView([22.5726, 88.3639], 13);
+
+      // OpenStreetMap tiles
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(map);
+
+      let pickupMarker = null;
+      let dropMarker = null;
+
+      let pickupCoords = null;
+      let dropCoords = null;
+
+      let routeLine = null;
+
+      // ============================
+      // GET LOCATION NAME
+      // ============================
+      async function getLocationName(lat, lng) {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+
+        const response = await fetch(url);
+
+        const data = await response.json();
+
+        console.log(data);
+
+        return (
+          data.address.suburb ||
+          data.address.road ||
+          data.address.city ||
+          data.display_name
+        );
+      }
+
+      // ============================
+      // MAP CLICK
+      // ============================
+      map.on("click", async function (e) {
+        // PICKUP
+        if (!pickupMarker) {
+          pickupCoords = e.latlng;
+
+          pickupMarker = L.marker(e.latlng)
+            .addTo(map)
+            .bindPopup("Pickup")
+            .openPopup();
+
+          // remove pickup marker
+          pickupMarker.on("click", function () {
+            map.removeLayer(pickupMarker);
+
+            pickupMarker = null;
+            pickupCoords = null;
+
+            document.getElementById("pickup_location").value = "";
+
+            clearRoute();
+          });
+
+          // pickup location name
+          const pickupName = await getLocationName(e.latlng.lat, e.latlng.lng);
+
+          document.getElementById("pickup_location").value = pickupName;
+        }
+
+        // DROP
+        else if (!dropMarker) {
+          dropCoords = e.latlng;
+
+          dropMarker = L.marker(e.latlng)
+            .addTo(map)
+            .bindPopup("Drop")
+            .openPopup();
+
+          // remove drop marker
+          dropMarker.on("click", function () {
+            map.removeLayer(dropMarker);
+
+            dropMarker = null;
+            dropCoords = null;
+
+            document.getElementById("drop_location").value = "";
+
+            clearRoute();
+          });
+
+          // drop location name
+          const dropName = await getLocationName(e.latlng.lat, e.latlng.lng);
+
+          document.getElementById("drop_location").value = dropName;
+
+          // calculate route
+          await calculateRoute();
+        }
+      });
+
+      // ============================
+      // CLEAR ROUTE
+      // ============================
+      function clearRoute() {
+        if (routeLine) {
+          map.removeLayer(routeLine);
+
+          routeLine = null;
+        }
+
+        document.getElementById("distance_km").value = "";
+
+        document.getElementById("fare").value = "";
+      }
+
+      // ============================
+      // RESET EVERYTHING
+      // ============================
+      function resetMap() {
+        // remove pickup
+        if (pickupMarker) {
+          map.removeLayer(pickupMarker);
+
+          pickupMarker = null;
+        }
+
+        // remove drop
+        if (dropMarker) {
+          map.removeLayer(dropMarker);
+
+          dropMarker = null;
+        }
+
+        // remove route
+        if (routeLine) {
+          map.removeLayer(routeLine);
+
+          routeLine = null;
+        }
+
+        pickupCoords = null;
+        dropCoords = null;
+
+        document.getElementById("pickup_location").value = "";
+
+        document.getElementById("drop_location").value = "";
+
+        document.getElementById("distance_km").value = "";
+
+        document.getElementById("fare").value = "";
+      }
+
+      // ============================
+      // CALCULATE ROUTE
+      // ============================
+      async function calculateRoute() {
+        const url = `https://api.openrouteservice.org/v2/directions/driving-car/geojson`;
+
+        const body = {
+          coordinates: [
+            [pickupCoords.lng, pickupCoords.lat],
+            [dropCoords.lng, dropCoords.lat],
+          ],
+        };
+
+        const response = await fetch(url, {
+          method: "POST",
+
+          headers: {
+            Authorization: API_KEY,
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify(body),
+        });
+
+        const data = await response.json();
+
+        console.log(data);
+
+        // route coordinates
+        const coords = data.features[0].geometry.coordinates;
+
+        // convert coordinates for Leaflet
+        const latlngs = coords.map((coord) => [coord[1], coord[0]]);
+
+        // remove old route
+        if (routeLine) {
+          map.removeLayer(routeLine);
+        }
+
+        // draw route
+        routeLine = L.polyline(latlngs, {
+          color: "green",
+          weight: 5,
+        }).addTo(map);
+
+        // fit map to route
+        map.fitBounds(routeLine.getBounds());
+
+        // distance in KM
+        const distance = data.features[0].properties.summary.distance / 1000;
+
+        document.getElementById("distance_km").value = distance.toFixed(2);
+
+        // fare calculation
+        const fare = distance * FARE_PER_KM;
+
+        document.getElementById("fare").value = `₹${fare.toFixed(2)}`;
+      }
+    </script>
+  </body>
+</html>
