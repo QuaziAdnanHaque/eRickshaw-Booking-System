@@ -1,9 +1,12 @@
 <!doctype html>
+
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create Ride</title>
+
+    <title>Book Ride | EcoRide</title>
 
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -13,120 +16,273 @@
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
     <style>
+      body {
+        font-family: "Work Sans", sans-serif;
+        background: #f7f9fb;
+      }
+
       #map {
         height: 500px;
       }
     </style>
   </head>
 
-  <body class="bg-gray-100 p-8">
-    <div class="max-w-5xl mx-auto">
-      <!-- Heading -->
-      <div class="mb-6">
-        <h1 class="text-4xl font-bold text-green-700">Book an e-Rickshaw</h1>
+  <body class="min-h-screen flex flex-col">
+    <!-- ========================= -->
+    <!-- NAVBAR -->
+    <!-- ========================= -->
 
-        <p class="text-gray-600 mt-2">
-          Select pickup and drop locations directly from the map
-        </p>
+    <header class="bg-white border-b sticky top-0 z-50">
+      <div
+        class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between"
+      >
+        <!-- Left -->
+        <div class="flex items-center gap-4">
+          <!-- Back Button -->
+          <a
+            href="{% url 'accounts:customer_dashboard' %}"
+            class="h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-100 transition"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-slate-700"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </a>
+
+          <!-- Logo -->
+          <span class="text-2xl font-extrabold text-green-700"> EcoRide </span>
+        </div>
+
+        <!-- Right -->
+        <div class="flex items-center gap-5">
+          <a
+            href="{% url 'accounts:customer_dashboard' %}"
+            class="text-slate-600 hover:text-green-700 font-semibold"
+          >
+            Dashboard
+          </a>
+
+          <span class="hidden md:block text-slate-500">
+            {{ request.user.username }}
+          </span>
+
+          <!-- Logout -->
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+
+            <button
+              class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg font-semibold"
+            >
+              Logout
+            </button>
+          </form>
+        </div>
       </div>
+    </header>
 
-      <!-- Map -->
-      <div id="map" class="rounded-xl overflow-hidden shadow-lg border"></div>
+    <!-- ========================= -->
+    <!-- MAIN -->
+    <!-- ========================= -->
 
-      <!-- Form -->
-      <form method="post" class="mt-8 bg-white p-8 rounded-xl shadow-lg">
-        {% csrf_token %}
-
-        <!-- Pickup -->
-        <div class="mb-5">
-          <label class="block text-sm font-bold mb-2"> Pickup Location </label>
-
-          <input
-            type="text"
-            name="pickup"
-            id="pickup_location"
-            readonly
-            class="w-full p-3 border rounded-lg bg-gray-50"
-            placeholder="Select pickup from map"
-          />
-        </div>
-
-        <!-- Drop -->
-        <div class="mb-5">
-          <label class="block text-sm font-bold mb-2"> Drop Location </label>
-
-          <input
-            type="text"
-            name="drop"
-            id="drop_location"
-            readonly
-            class="w-full p-3 border rounded-lg bg-gray-50"
-            placeholder="Select drop from map"
-          />
-        </div>
-
-        <!-- Distance -->
-        <div class="mb-5">
-          <label class="block text-sm font-bold mb-2"> Distance (KM) </label>
-
-          <input
-            type="text"
-            name="distance"
-            id="distance_km"
-            readonly
-            class="w-full p-3 border rounded-lg bg-gray-50"
-            placeholder="Distance will appear automatically"
-          />
-        </div>
-
-        <!-- Fare -->
+    <main class="flex-grow py-10 px-6">
+      <div class="max-w-7xl mx-auto">
+        <!-- Heading -->
         <div class="mb-8">
-          <label class="block text-sm font-bold mb-2"> Estimated Fare </label>
+          <h1 class="text-5xl font-extrabold text-green-700">
+            Book an e-Rickshaw
+          </h1>
 
-          <input
-            type="text"
-            id="fare"
-            readonly
-            class="w-full p-3 border rounded-lg bg-gray-50"
-            placeholder="Fare will appear automatically"
-          />
+          <p class="text-slate-500 mt-3 text-lg">
+            Select pickup and drop locations directly from the map.
+          </p>
         </div>
 
-        <!-- Buttons -->
-        <div class="flex gap-4">
-          <button
-            type="submit"
-            class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold"
-          >
-            Book Ride
-          </button>
+        <!-- Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- ===================== -->
+          <!-- MAP -->
+          <!-- ===================== -->
 
-          <button
-            type="button"
-            onclick="resetMap()"
-            class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-semibold"
-          >
-            Reset
-          </button>
+          <div class="lg:col-span-8">
+            <div
+              id="map"
+              class="rounded-2xl overflow-hidden shadow-lg border border-slate-200"
+            ></div>
+          </div>
+
+          <!-- ===================== -->
+          <!-- FORM -->
+          <!-- ===================== -->
+
+          <div class="lg:col-span-4">
+            <form
+              method="post"
+              class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200 h-full flex flex-col"
+            >
+              {% csrf_token %}
+
+              <!-- Title -->
+              <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-800">Ride Details</h2>
+
+                <p class="text-slate-500 mt-2">
+                  Route and fare will calculate automatically.
+                </p>
+              </div>
+
+              <!-- Pickup -->
+              <div class="mb-5">
+                <label class="block text-sm font-bold mb-2 text-slate-700">
+                  Pickup Location
+                </label>
+
+                <input
+                  type="text"
+                  name="pickup"
+                  id="pickup_location"
+                  readonly
+                  required
+                  class="w-full p-4 border rounded-xl bg-slate-50"
+                  placeholder="Select pickup from map"
+                />
+              </div>
+
+              <!-- Drop -->
+              <div class="mb-5">
+                <label class="block text-sm font-bold mb-2 text-slate-700">
+                  Drop Location
+                </label>
+
+                <input
+                  type="text"
+                  name="drop"
+                  id="drop_location"
+                  readonly
+                  required
+                  class="w-full p-4 border rounded-xl bg-slate-50"
+                  placeholder="Select drop from map"
+                />
+              </div>
+
+              <!-- Distance -->
+              <div class="mb-5">
+                <label class="block text-sm font-bold mb-2 text-slate-700">
+                  Distance (KM)
+                </label>
+
+                <input
+                  type="text"
+                  name="distance"
+                  id="distance_km"
+                  readonly
+                  required
+                  class="w-full p-4 border rounded-xl bg-slate-50"
+                  placeholder="Distance will appear automatically"
+                />
+              </div>
+
+              <!-- Fare -->
+              <div class="mb-8">
+                <label class="block text-sm font-bold mb-2 text-slate-700">
+                  Estimated Fare
+                </label>
+
+                <input
+                  type="text"
+                  id="fare"
+                  readonly
+                  class="w-full p-4 border rounded-xl bg-green-50 text-green-700 font-bold"
+                  placeholder="Fare will appear automatically"
+                />
+              </div>
+
+              <!-- Buttons -->
+              <div class="mt-auto flex gap-4">
+                <!-- Submit -->
+                <button
+                  type="submit"
+                  class="flex-1 bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-semibold"
+                >
+                  Book Ride
+                </button>
+
+                <!-- Reset -->
+                <button
+                  type="button"
+                  onclick="resetMap()"
+                  class="bg-red-500 hover:bg-red-600 text-white px-6 py-4 rounded-xl font-semibold"
+                >
+                  Reset
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </form>
-    </div>
+      </div>
+    </main>
+
+    <!-- ========================= -->
+    <!-- FOOTER -->
+    <!-- ========================= -->
+
+    <footer class="bg-white border-t mt-10">
+      <div
+        class="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center"
+      >
+        <span class="font-bold text-slate-800"> EcoRide </span>
+
+        <span class="text-slate-500 text-sm">
+          © 2026 EcoRide Technologies
+        </span>
+      </div>
+    </footer>
+
+    <!-- ========================= -->
+    <!-- MAP SCRIPT -->
+    <!-- ========================= -->
 
     <script>
       const FARE_PER_KM = 10;
 
-      // 🔑 Replace with your real OpenRouteService API key
+      // =========================
+      // PUT YOUR OPENROUTESERVICE
+      // API KEY HERE
+      // =========================
+
       const API_KEY =
         "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjQ5MjM1ZWU5MDRmYzRjZTJiYWViYzIyMDI2MGI5MmM4IiwiaCI6Im11cm11cjY0In0=";
 
-      // Kolkata default location
+      // =========================
+      // MAP
+      // =========================
+
       const map = L.map("map").setView([22.5726, 88.3639], 13);
 
       // OpenStreetMap tiles
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "&copy; OpenStreetMap contributors",
       }).addTo(map);
+
+      // =========================
+      // VARIABLES
+      // =========================
 
       let pickupMarker = null;
       let dropMarker = null;
@@ -136,17 +292,16 @@
 
       let routeLine = null;
 
-      // ============================
+      // =========================
       // GET LOCATION NAME
-      // ============================
+      // =========================
+
       async function getLocationName(lat, lng) {
         const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
 
         const response = await fetch(url);
 
         const data = await response.json();
-
-        console.log(data);
 
         return (
           data.address.suburb ||
@@ -156,9 +311,10 @@
         );
       }
 
-      // ============================
+      // =========================
       // MAP CLICK
-      // ============================
+      // =========================
+
       map.on("click", async function (e) {
         // PICKUP
         if (!pickupMarker) {
@@ -169,7 +325,7 @@
             .bindPopup("Pickup")
             .openPopup();
 
-          // remove pickup marker
+          // Remove pickup marker
           pickupMarker.on("click", function () {
             map.removeLayer(pickupMarker);
 
@@ -181,7 +337,7 @@
             clearRoute();
           });
 
-          // pickup location name
+          // Location name
           const pickupName = await getLocationName(e.latlng.lat, e.latlng.lng);
 
           document.getElementById("pickup_location").value = pickupName;
@@ -196,7 +352,7 @@
             .bindPopup("Drop")
             .openPopup();
 
-          // remove drop marker
+          // Remove drop marker
           dropMarker.on("click", function () {
             map.removeLayer(dropMarker);
 
@@ -208,19 +364,20 @@
             clearRoute();
           });
 
-          // drop location name
+          // Location name
           const dropName = await getLocationName(e.latlng.lat, e.latlng.lng);
 
           document.getElementById("drop_location").value = dropName;
 
-          // calculate route
+          // Calculate route
           await calculateRoute();
         }
       });
 
-      // ============================
+      // =========================
       // CLEAR ROUTE
-      // ============================
+      // =========================
+
       function clearRoute() {
         if (routeLine) {
           map.removeLayer(routeLine);
@@ -233,25 +390,26 @@
         document.getElementById("fare").value = "";
       }
 
-      // ============================
+      // =========================
       // RESET EVERYTHING
-      // ============================
+      // =========================
+
       function resetMap() {
-        // remove pickup
+        // Remove pickup
         if (pickupMarker) {
           map.removeLayer(pickupMarker);
 
           pickupMarker = null;
         }
 
-        // remove drop
+        // Remove drop
         if (dropMarker) {
           map.removeLayer(dropMarker);
 
           dropMarker = null;
         }
 
-        // remove route
+        // Remove route
         if (routeLine) {
           map.removeLayer(routeLine);
 
@@ -270,15 +428,17 @@
         document.getElementById("fare").value = "";
       }
 
-      // ============================
+      // =========================
       // CALCULATE ROUTE
-      // ============================
+      // =========================
+
       async function calculateRoute() {
         const url = `https://api.openrouteservice.org/v2/directions/driving-car/geojson`;
 
         const body = {
           coordinates: [
             [pickupCoords.lng, pickupCoords.lat],
+
             [dropCoords.lng, dropCoords.lat],
           ],
         };
@@ -288,6 +448,7 @@
 
           headers: {
             Authorization: API_KEY,
+
             "Content-Type": "application/json",
           },
 
@@ -296,34 +457,32 @@
 
         const data = await response.json();
 
-        console.log(data);
-
-        // route coordinates
+        // Route coordinates
         const coords = data.features[0].geometry.coordinates;
 
-        // convert coordinates for Leaflet
+        // Convert for Leaflet
         const latlngs = coords.map((coord) => [coord[1], coord[0]]);
 
-        // remove old route
+        // Remove old route
         if (routeLine) {
           map.removeLayer(routeLine);
         }
 
-        // draw route
+        // Draw route
         routeLine = L.polyline(latlngs, {
           color: "green",
           weight: 5,
         }).addTo(map);
 
-        // fit map to route
+        // Fit map
         map.fitBounds(routeLine.getBounds());
 
-        // distance in KM
+        // Distance
         const distance = data.features[0].properties.summary.distance / 1000;
 
         document.getElementById("distance_km").value = distance.toFixed(2);
 
-        // fare calculation
+        // Fare
         const fare = distance * FARE_PER_KM;
 
         document.getElementById("fare").value = `₹${fare.toFixed(2)}`;

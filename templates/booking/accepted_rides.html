@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8"/>
+
+    <meta
+        content="width=device-width, initial-scale=1.0"
+        name="viewport"
+    />
+
+    <title>My Accepted Rides - EcoRide</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet"
+    />
+
+    <!-- Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet"
+    />
+
+    <style>
+
+        .material-symbols-outlined {
+
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24;
+        }
+
+        body {
+
+            background-color: #f7f9fb;
+            font-family: 'Work Sans', sans-serif;
+        }
+
+    </style>
+
+</head>
+
+<body class="min-h-screen text-slate-800">
+
+<!-- ====================== -->
+<!-- NAVBAR -->
+<!-- ====================== -->
+
+<header
+    class="bg-white sticky top-0 z-50 border-b border-slate-200 h-16 flex items-center"
+>
+
+    <div
+        class="max-w-7xl mx-auto w-full px-5 flex justify-between items-center"
+    >
+
+        <!-- Left -->
+        <div class="flex items-center gap-4">
+
+            <a
+                href="{% url 'accounts:driver_dashboard' %}"
+                class="flex items-center text-slate-500 hover:text-emerald-600 p-2 rounded-lg"
+            >
+
+                <span class="material-symbols-outlined">
+
+                    arrow_back
+
+                </span>
+
+            </a>
+
+            <span
+                class="text-2xl font-extrabold text-emerald-600"
+            >
+
+                EcoRide
+
+            </span>
+
+        </div>
+
+        <!-- Right -->
+        <div class="flex items-center gap-5">
+
+            <div class="hidden md:flex flex-col items-end">
+
+                <span class="font-semibold">
+
+                    {{ request.user.username }}
+
+                </span>
+
+                <span class="text-sm text-slate-500">
+
+                    Driver
+
+                </span>
+
+            </div>
+
+            <form
+                method="post"
+                action="{% url 'logout' %}"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    class="flex items-center gap-2 text-slate-500 hover:text-red-500"
+                >
+
+                    <span class="material-symbols-outlined">
+
+                        logout
+
+                    </span>
+
+                    Logout
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</header>
+
+<!-- ====================== -->
+<!-- MAIN -->
+<!-- ====================== -->
+
+<main
+    class="max-w-7xl mx-auto px-5 py-10"
+>
+
+    <!-- Header -->
+    <section class="mb-10">
+
+        <h1
+            class="text-4xl font-extrabold mb-2"
+        >
+
+            My Accepted Rides
+
+        </h1>
+
+        <p
+            class="text-slate-500"
+        >
+
+            Manage rides you have accepted.
+
+        </p>
+
+    </section>
+
+    <!-- ================= -->
+    <!-- RIDE LIST -->
+    <!-- ================= -->
+
+    {% if rides %}
+
+    <div
+        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+    >
+
+        {% for ride in rides %}
+
+        <article
+            class="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col shadow-sm"
+        >
+
+            <!-- Card Body -->
+            <div class="p-6 flex-grow">
+
+                <!-- Top -->
+                <div
+                    class="flex justify-between items-start mb-6"
+                >
+
+                    <!-- Customer -->
+                    <div class="flex items-center gap-4">
+
+                        <div
+                            class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center"
+                        >
+
+                            <span
+                                class="material-symbols-outlined text-emerald-700"
+                            >
+
+                                person
+
+                            </span>
+
+                        </div>
+
+                        <div>
+
+                            <h3
+                                class="font-bold"
+                            >
+
+                                {{ ride.customer.username }}
+
+                            </h3>
+
+                            <p
+                                class="text-sm text-slate-500"
+                            >
+
+                                {{ ride.created_at }}
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Status -->
+                    <span
+                        class="px-4 py-1 bg-emerald-100 text-emerald-700 text-sm font-semibold rounded-full"
+                    >
+
+                        {{ ride.status }}
+
+                    </span>
+
+                </div>
+
+                <!-- Pickup / Drop -->
+                <div
+                    class="space-y-5 mb-6 relative"
+                >
+
+                    <!-- Line -->
+                    <div
+                        class="absolute left-3 top-5 bottom-5 w-0.5 border-l-2 border-dashed border-slate-300"
+                    ></div>
+
+                    <!-- Pickup -->
+                    <div
+                        class="flex gap-4 relative"
+                    >
+
+                        <span
+                            class="material-symbols-outlined text-emerald-600 z-10 bg-white"
+                        >
+
+                            location_on
+
+                        </span>
+
+                        <div>
+
+                            <p
+                                class="text-sm font-semibold text-slate-500"
+                            >
+
+                                Pickup
+
+                            </p>
+
+                            <p
+                                class="font-semibold"
+                            >
+
+                                {{ ride.pickup }}
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Drop -->
+                    <div
+                        class="flex gap-4 relative"
+                    >
+
+                        <span
+                            class="material-symbols-outlined text-red-500 z-10 bg-white"
+                        >
+
+                            near_me
+
+                        </span>
+
+                        <div>
+
+                            <p
+                                class="text-sm font-semibold text-slate-500"
+                            >
+
+                                Drop-off
+
+                            </p>
+
+                            <p
+                                class="font-semibold"
+                            >
+
+                                {{ ride.drop }}
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Distance & Fare -->
+                <div
+                    class="flex justify-between pt-5 border-t border-slate-100"
+                >
+
+                    <!-- Distance -->
+                    <div>
+
+                        <p
+                            class="text-sm text-slate-500"
+                        >
+
+                            Distance
+
+                        </p>
+
+                        <p
+                            class="text-2xl font-bold"
+                        >
+
+                            {{ ride.distance }} KM
+
+                        </p>
+
+                    </div>
+
+                    <!-- Fare -->
+                    <div class="text-right">
+
+                        <p
+                            class="text-sm text-slate-500"
+                        >
+
+                            Fare
+
+                        </p>
+
+                        <p
+                            class="text-2xl font-bold text-emerald-600"
+                        >
+
+                            ₹{{ ride.fare }}
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Complete Ride -->
+            {% if ride.status == 'accepted' %}
+
+            <div class="px-6 pb-6">
+
+                <form
+                    method="post"
+                    action="{% url 'booking:complete_ride' ride.id %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-14 rounded-xl font-semibold transition-all flex items-center justify-center gap-3"
+                    >
+
+                        <span class="material-symbols-outlined">
+
+                            check_circle
+
+                        </span>
+
+                        Complete Ride
+
+                    </button>
+
+                </form>
+
+            </div>
+
+            {% endif %}
+
+        </article>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <!-- EMPTY STATE -->
+
+    <section
+        class="bg-white border-2 border-dashed rounded-2xl py-20 px-6 text-center"
+    >
+
+        <div
+            class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6"
+        >
+
+            <span
+                class="material-symbols-outlined text-slate-400 text-6xl"
+            >
+
+                history
+
+            </span>
+
+        </div>
+
+        <h2
+            class="text-3xl font-bold mb-3"
+        >
+
+            No accepted rides yet
+
+        </h2>
+
+        <p
+            class="text-slate-500 mb-8"
+        >
+
+            Accepted rides will appear here.
+
+        </p>
+
+        <a
+            href="{% url 'booking:available_rides' %}"
+            class="inline-flex items-center gap-3 px-8 py-4 border-2 border-emerald-600 text-emerald-600 rounded-xl font-semibold hover:bg-emerald-50"
+        >
+
+            <span class="material-symbols-outlined">
+
+                arrow_back
+
+            </span>
+
+            View Available Rides
+
+        </a>
+
+    </section>
+
+    {% endif %}
+
+</main>
+
+<!-- ====================== -->
+<!-- FOOTER -->
+<!-- ====================== -->
+
+<footer
+    class="bg-slate-50 border-t border-slate-200 mt-16"
+>
+
+    <div
+        class="max-w-7xl mx-auto py-8 px-5 flex flex-col md:flex-row justify-between items-center gap-4"
+    >
+
+        <div>
+
+            <span
+                class="text-lg font-bold"
+            >
+
+                EcoRide
+
+            </span>
+
+            <p
+                class="text-sm text-slate-500"
+            >
+
+                © 2026 EcoRide Technologies
+
+            </p>
+
+        </div>
+
+        <nav class="flex gap-6">
+
+            <a
+                href="#"
+                class="text-sm text-slate-500 hover:text-emerald-600"
+            >
+
+                Privacy Policy
+
+            </a>
+
+            <a
+                href="#"
+                class="text-sm text-slate-500 hover:text-emerald-600"
+            >
+
+                Terms
+
+            </a>
+
+            <a
+                href="#"
+                class="text-sm text-slate-500 hover:text-emerald-600"
+            >
+
+                Support
+
+            </a>
+
+        </nav>
+
+    </div>
+
+</footer>
+
+</body>
+
+</html>

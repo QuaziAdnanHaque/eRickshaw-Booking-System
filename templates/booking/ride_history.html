@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ride History</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+
+  <body class="bg-gray-100 p-8">
+    <div class="max-w-5xl mx-auto">
+      <!-- Heading -->
+      <div class="mb-8">
+        <h1 class="text-4xl font-bold text-green-700">My Ride History</h1>
+
+        <p class="text-gray-600 mt-2">View all your booked rides</p>
+      </div>
+
+      <!-- Ride List -->
+      <div class="space-y-5">
+        {% for ride in rides %}
+
+        <div class="bg-white rounded-xl shadow p-6">
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm text-gray-500">Pickup</p>
+
+              <p class="font-semibold">{{ ride.pickup }}</p>
+            </div>
+
+            <div>
+              <p class="text-sm text-gray-500">Drop</p>
+
+              <p class="font-semibold">{{ ride.drop }}</p>
+            </div>
+
+            <div>
+              <p class="text-sm text-gray-500">Distance</p>
+
+              <p class="font-semibold">{{ ride.distance }} KM</p>
+            </div>
+
+            <div>
+              <p class="text-sm text-gray-500">Fare</p>
+
+              <p class="font-semibold text-green-700">₹{{ ride.fare }}</p>
+            </div>
+
+            <div>
+              <p class="text-sm text-gray-500">Status</p>
+
+              <p class="font-semibold">{{ ride.status }}</p>
+            </div>
+
+            <div>
+              <p class="text-sm text-gray-500">Driver</p>
+
+              <p class="font-semibold">
+                {% if ride.driver %} {{ ride.driver.username }} {% else %} Not
+                Assigned Yet {% endif %}
+              </p>
+            </div>
+          </div>
+
+          <!-- Time -->
+          <div class="mt-4 text-sm text-gray-500">
+            Booked on: {{ ride.created_at }}
+          </div>
+        </div>
+
+        {% empty %}
+
+        <div class="bg-white rounded-xl shadow p-8 text-center">
+          <h2 class="text-xl font-semibold mb-2">No rides booked yet</h2>
+
+          <p class="text-gray-500">Your booked rides will appear here</p>
+        </div>
+
+        {% endfor %}
+      </div>
+    </div>
+  </body>
+</html>

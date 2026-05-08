@@ -1,42 +1,303 @@
 <!doctype html>
+
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Available Rides</title>
+    <meta charset="utf-8" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+
+    <title>EcoRide - Available Rides</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Work+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Icons -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+
+      body {
+        background-color: #f7f9fb;
+        font-family: "Work Sans", sans-serif;
+      }
+    </style>
   </head>
-  <body class="bg-gray-100 p-10">
-    <h1 class="text-3xl font-bold mb-6">Available Ride Requests</h1>
 
-    <div class="space-y-4">
-      {% for ride in rides %}
+  <body class="min-h-screen text-slate-800">
+    <!-- ====================== -->
+    <!-- NAVBAR -->
+    <!-- ====================== -->
 
-      <div class="bg-white p-6 rounded-lg shadow">
-        <p><strong>Customer:</strong> {{ ride.customer.username }}</p>
+    <header class="bg-white sticky top-0 z-50 border-b border-slate-200">
+      <div
+        class="max-w-7xl mx-auto px-5 h-16 flex justify-between items-center"
+      >
+        <!-- Left -->
+        <div class="flex items-center gap-4">
+          <a
+            href="{% url 'accounts:driver_dashboard' %}"
+            class="p-2 hover:bg-slate-100 rounded-full transition-colors"
+          >
+            <span class="material-symbols-outlined text-slate-500">
+              arrow_back
+            </span>
+          </a>
 
-        <p><strong>Pickup:</strong> {{ ride.pickup }}</p>
+          <span class="text-2xl font-extrabold text-emerald-600">
+            EcoRide
+          </span>
+        </div>
 
-        <p><strong>Drop:</strong> {{ ride.drop }}</p>
+        <!-- Right -->
+        <div class="flex items-center gap-4">
+          <div class="hidden md:flex flex-col items-end">
+            <span class="font-semibold"> {{ request.user.username }} </span>
 
-        <p><strong>Distance:</strong> {{ ride.distance }} km</p>
+            <span class="text-sm text-slate-500"> Driver </span>
+          </div>
 
-        <p><strong>Fare:</strong> ₹{{ ride.fare }}</p>
+          <!-- Logout -->
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
 
-        <form method="post" action="{% url 'booking:accept_ride' ride.id %}">
-          {% csrf_token %}
-          <button type="submit">Accept Ride</button>
-        </form>
+            <button
+              class="flex items-center gap-2 text-slate-500 hover:text-red-500"
+            >
+              <span class="material-symbols-outlined"> logout </span>
+
+              Logout
+            </button>
+          </form>
+        </div>
+      </div>
+    </header>
+
+    <!-- ====================== -->
+    <!-- MAIN -->
+    <!-- ====================== -->
+
+    <main class="max-w-7xl mx-auto px-5 py-10 space-y-8">
+      <!-- Header -->
+      <section>
+        <div>
+          <h1 class="text-4xl font-extrabold">Available Ride Requests</h1>
+
+          <p class="text-slate-500 mt-2">
+            Nearby passengers waiting for rides.
+          </p>
+        </div>
+      </section>
+
+      <!-- ================= -->
+      <!-- AVAILABLE RIDES -->
+      <!-- ================= -->
+
+      {% if rides %}
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {% for ride in rides %}
+
+        <div
+          class="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:border-emerald-300 transition-all duration-300"
+        >
+          <div class="p-6 space-y-6">
+            <!-- Top -->
+            <div class="flex justify-between items-start">
+              <!-- Customer -->
+              <div class="flex items-center gap-4">
+                <div
+                  class="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center"
+                >
+                  <span class="material-symbols-outlined text-slate-600">
+                    person
+                  </span>
+                </div>
+
+                <div>
+                  <h3 class="font-bold">{{ ride.customer.username }}</h3>
+
+                  <p class="text-sm text-slate-500">Ride Request</p>
+                </div>
+              </div>
+
+              <!-- Fare -->
+              <div class="text-right">
+                <span class="block text-3xl font-extrabold text-emerald-600">
+                  ₹{{ ride.fare }}
+                </span>
+
+                <span class="text-sm text-slate-500 uppercase">
+                  Estimated Fare
+                </span>
+              </div>
+            </div>
+
+            <!-- Pickup & Drop -->
+            <div class="relative pl-8 space-y-6 py-2">
+              <!-- Timeline -->
+              <div
+                class="absolute left-3 top-3 bottom-3 w-[2px] border-l-2 border-dashed border-slate-300"
+              ></div>
+
+              <!-- Pickup -->
+              <div class="relative">
+                <span
+                  class="absolute -left-[26px] top-0 h-4 w-4 rounded-full bg-emerald-600 ring-4 ring-emerald-100 border-2 border-white"
+                ></span>
+
+                <p class="text-sm text-emerald-700 uppercase font-bold">
+                  Pickup
+                </p>
+
+                <p class="font-semibold">{{ ride.pickup }}</p>
+              </div>
+
+              <!-- Drop -->
+              <div class="relative">
+                <span
+                  class="absolute -left-[26px] top-0 h-4 w-4 rounded-full bg-red-500 border-2 border-white"
+                ></span>
+
+                <p class="text-sm text-red-600 uppercase font-bold">Drop-off</p>
+
+                <p class="font-semibold">{{ ride.drop }}</p>
+              </div>
+            </div>
+
+            <!-- Metrics -->
+            <div class="flex items-center gap-8 pt-4 border-t border-slate-100">
+              <!-- Distance -->
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-slate-500">
+                  distance
+                </span>
+
+                <span class="font-semibold"> {{ ride.distance }} KM </span>
+              </div>
+
+              <!-- Status -->
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-slate-500">
+                  schedule
+                </span>
+
+                <span class="font-semibold capitalize">
+                  {{ ride.status }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Accept Button -->
+            <form
+              method="post"
+              action="{% url 'booking:accept_ride' ride.id %}"
+            >
+              {% csrf_token %}
+
+              <button
+                type="submit"
+                class="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-3"
+              >
+                Accept Ride
+
+                <span class="material-symbols-outlined"> trending_flat </span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {% endfor %}
       </div>
 
-      {% empty %}
+      {% else %}
 
-      <div class="bg-white p-6 rounded-lg shadow">
-        No rides available right now.
+      <!-- EMPTY STATE -->
+
+      <section
+        class="flex flex-col items-center justify-center py-24 space-y-6 text-center max-w-md mx-auto"
+      >
+        <div class="relative">
+          <div
+            class="h-32 w-32 rounded-full bg-slate-100 flex items-center justify-center"
+          >
+            <span class="material-symbols-outlined text-slate-300 text-7xl">
+              electric_rickshaw
+            </span>
+          </div>
+
+          <span
+            class="absolute -bottom-2 -right-2 h-12 w-12 bg-white shadow-lg rounded-full flex items-center justify-center border-2 border-slate-100"
+          >
+            <span class="material-symbols-outlined text-red-500">
+              search_off
+            </span>
+          </span>
+        </div>
+
+        <div>
+          <h2 class="text-3xl font-bold mb-3">No rides available right now</h2>
+
+          <p class="text-slate-500">
+            New ride requests will appear here automatically.
+          </p>
+        </div>
+
+        <a
+          href="{% url 'accounts:driver_dashboard' %}"
+          class="px-8 h-12 border-2 border-emerald-600 text-emerald-600 font-semibold rounded-full hover:bg-emerald-50 transition-colors flex items-center justify-center"
+        >
+          Back to Dashboard
+        </a>
+      </section>
+
+      {% endif %}
+    </main>
+
+    <!-- ====================== -->
+    <!-- FOOTER -->
+    <!-- ====================== -->
+
+    <footer class="bg-slate-50 border-t border-slate-200 mt-16">
+      <div
+        class="max-w-7xl mx-auto py-8 px-5 flex flex-col md:flex-row justify-between items-center gap-4"
+      >
+        <div class="flex flex-col items-center md:items-start gap-2">
+          <span class="text-lg font-bold"> EcoRide </span>
+
+          <span class="text-sm text-slate-500">
+            © 2026 EcoRide Technologies
+          </span>
+        </div>
+
+        <div class="flex gap-6">
+          <a href="#" class="text-sm text-slate-500 hover:text-emerald-600">
+            Privacy Policy
+          </a>
+
+          <a href="#" class="text-sm text-slate-500 hover:text-emerald-600">
+            Terms
+          </a>
+
+          <a href="#" class="text-sm text-slate-500 hover:text-emerald-600">
+            Support
+          </a>
+        </div>
       </div>
-
-      {% endfor %}
-    </div>
+    </footer>
   </body>
 </html>
