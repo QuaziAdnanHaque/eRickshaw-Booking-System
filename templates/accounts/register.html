@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -5,12 +6,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>eRickshaw Booking - Register</title>
 
+    <!-- ========================= -->
+    <!-- FAVICON -->
+    <!-- ========================= -->
+
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{% static 'favicon_io/apple-touch-icon.png' %}"
+    />
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="{% static 'favicon_io/favicon-32x32.png' %}"
+    />
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="{% static 'favicon_io/favicon-16x16.png' %}"
+    />
+
+    <link rel="shortcut icon" href="{% static 'favicon_io/favicon.ico' %}" />
+
+    <link rel="manifest" href="{% static 'favicon_io/site.webmanifest' %}" />
+
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=Work+Sans:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+    <!-- Favicon -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/templates/favicon_io/favicon_io/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/templates/favicon_io/favicon_io/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/templates/favicon_io/favicon_io/favicon-16x16.png"
+    />
+    <link rel="manifest" href="/templates/favicon_io/site.webmanifest" />
 
     <style>
       body {
@@ -33,7 +81,7 @@
         <h1
           class="text-xl font-extrabold text-green-600 font-['Plus_Jakarta_Sans']"
         >
-          eRickshaw Booking
+          EcoRide
         </h1>
       </div>
     </header>

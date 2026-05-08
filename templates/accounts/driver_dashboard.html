@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 
 <html lang="en">
@@ -7,6 +8,34 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
     <title>EcoRide Driver Dashboard</title>
+
+    <!-- ========================= -->
+    <!-- FAVICON -->
+    <!-- ========================= -->
+
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{% static 'favicon_io/apple-touch-icon.png' %}"
+    />
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="{% static 'favicon_io/favicon-32x32.png' %}"
+    />
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="{% static 'favicon_io/favicon-16x16.png' %}"
+    />
+
+    <link rel="shortcut icon" href="{% static 'favicon_io/favicon.ico' %}" />
+
+    <link rel="manifest" href="{% static 'favicon_io/site.webmanifest' %}" />
 
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
 
@@ -20,6 +49,12 @@
     <link
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
       rel="stylesheet"
+    />
+    <!-- Favicon -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/favicon_io/android-chrome-192x192.png"
     />
 
     <style>

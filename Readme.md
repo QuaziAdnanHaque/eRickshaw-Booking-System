@@ -38,6 +38,61 @@ The application follows the **MVT (Model-View-Template)** architectural pattern 
 
 ---
 
+### 4. Data Flow Diagrams (DFD)
+
+#### 4.1 Level 0 (Context Diagram)
+The Context Diagram shows the eRickshaw system as a single high-level process interacting with external entities (Customer and Driver).
+
+```mermaid
+graph TD
+    Customer(Customer) -->|Ride Request, User Details| System[eRickshaw Booking System]
+    System -->|Ride Status, Assigned Driver, Fare| Customer
+    
+    Driver(Driver) -->|Availability, Accept/Complete Ride| System
+    System -->|Available Rides, Analytics| Driver
+```
+
+#### 4.2 Level 1 DFD
+The Level 1 DFD breaks down the main system into its core sub-processes: User Authentication, Ride Management, and Dashboard/Reporting, showing how data moves between these processes and data stores.
+
+```mermaid
+graph TD
+    %% Entities
+    C(Customer)
+    D(Driver)
+    
+    %% Processes
+    P1((1. User Auth & Management))
+    P2((2. Ride Management))
+    P3((3. Dashboard & History))
+    
+    %% Data Stores
+    D1[(Users Database)]
+    D2[(Rides Database)]
+    
+    %% Flows
+    C -->|Credentials/Registration| P1
+    P1 -->|Auth Session| C
+    P1 <-->|Read/Write User Data| D1
+    
+    D -->|Credentials/Registration| P1
+    P1 -->|Auth Session| D
+    
+    C -->|Pickup, Drop, Distance| P2
+    P2 -->|Fare, Ride Status| C
+    P2 <-->|Store/Update Ride Data| D2
+    
+    D -->|Accept/Complete Ride| P2
+    P2 -->|List Available Rides| D
+    
+    C -->|View History| P3
+    P3 -->|Ride Records| C
+    P3 <-->|Read Ride Data| D2
+    
+    D -->|View History/Metrics| P3
+    P3 -->|Performance Data| D
+```
+
 ### 4. Database Schema (Models)
 
 The project's data is logically structured into two primary Django applications: `accounts` and `booking`.
