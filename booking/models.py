@@ -13,7 +13,7 @@ class Ride(models.Model):
     pickup = models.CharField(max_length= 255)
     drop = models.CharField(max_length= 255)
     distance = models.FloatField()
-    fare = models.FloatField()
+    fare = models.IntegerField()
     status = models.CharField(max_length= 20, choices= Status_Choice, default= 'requested')
     created_at = models.DateTimeField(auto_now_add= True)
 

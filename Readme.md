@@ -98,3 +98,4 @@ To evolve into a production-ready system, the following features could be integr
 *   **Real-time Capabilities:** Implementing Django Channels (WebSockets) to instantly notify drivers of new requests without page refreshes.
 *   **Payment Gateway:** Integrating Stripe or Razorpay for cashless transactions.
 *   **Review & Rating System:** Allowing customers and drivers to rate each other post-ride for quality assurance.
+*   **Cache List APIs and Frequently Accessed Records to Reduce Database Abuse:** 
