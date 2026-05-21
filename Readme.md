@@ -1,5 +1,4 @@
 # eRickshaw: A Web-Based Ride Booking System
-## Academic Project Documentation
 
 ### Abstract
 The eRickshaw project is a web-based application developed using the Django web framework to facilitate the booking and management of electric rickshaw rides. The system provides a platform connecting customers who need transportation with available drivers. It features role-based access control, ride requesting, fare calculation, and ride tracking.
